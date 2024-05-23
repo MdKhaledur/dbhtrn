@@ -12,22 +12,21 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.RequestDispatcher;
+import jdk.jshell.spi.ExecutionControlProvider;
 
 import java.io.Serial;
-import java.util.List;
 import java.io.IOException;
-import java.sql.SQLException;
 
-@WebServlet("/")
+@WebServlet("/edit")
 
-public class EmployeeHomeController extends HttpServlet {
+public class EmployeeEditController extends HttpServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private EmployeeService employeeService;
 
-    public EmployeeHomeController() {
+    public EmployeeEditController() {
     }
 
     @Override
@@ -38,23 +37,25 @@ public class EmployeeHomeController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int page = 1;
-        if (request.getParameter("page") != null) {
-            page = Integer.parseInt(request.getParameter("page"));
-        }
         try {
-            int recordsPerPage = 5;
-            int offset = (page - 1) * recordsPerPage;
-            List<Employee> employees = employeeService.findAll(offset, recordsPerPage);
-            int totalEmployees = employeeService.count();
-            int totalPages = (int) Math.ceil((double) totalEmployees / recordsPerPage);
-            request.setAttribute("employees", employees);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("currentPage", page);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            int employeeId = Integer.parseInt(request.getParameter("id"));
+            Employee employee = employeeService.findById(employeeId);
+            request.setAttribute("employee", employee);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        RequestDispatcher view = request.getRequestDispatcher("/pages/home.jsp");
+        RequestDispatcher view = request.getRequestDispatcher("/pages/edit.jsp");
         view.forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            Employee employee = Employee.builder().employeeId(Integer.parseInt(request.getParameter("id"))).name(request.getParameter("name")).email(request.getParameter("email")).password(request.getParameter("password")).build();
+            employeeService.update(employee);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        response.sendRedirect("/");
     }
 }

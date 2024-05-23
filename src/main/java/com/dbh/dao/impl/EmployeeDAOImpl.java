@@ -1,15 +1,17 @@
 package com.dbh.dao.impl;
 
-import com.dbh.dao.EmployeeDAO;
-import com.dbh.entity.Employee;
 import com.dbh.utils.DatabaseConfig;
 
 import java.sql.Connection;
+
+import com.dbh.dao.EmployeeDAO;
+import com.dbh.entity.Employee;
+
+import java.util.List;
+import java.util.ArrayList;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class EmployeeDAOImpl implements EmployeeDAO {
 
@@ -17,7 +19,7 @@ public class EmployeeDAOImpl implements EmployeeDAO {
     public List<Employee> findAll(int offset, int recordPerPage) throws SQLException {
         List<Employee> employees = new ArrayList<>();
         Connection connection = DatabaseConfig.getconnection();
-        String sql = "SELECT * FROM employee ORDER BY  employeeId ASC LIMIT ?,?";
+        String sql = "SELECT * FROM employee ORDER BY employeeId ASC LIMIT ?,?";
         PreparedStatement pst = connection.prepareStatement(sql);
         pst.setInt(1, offset);
         pst.setInt(2, recordPerPage);

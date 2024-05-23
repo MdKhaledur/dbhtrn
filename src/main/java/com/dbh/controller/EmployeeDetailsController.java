@@ -14,20 +14,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.RequestDispatcher;
 
 import java.io.Serial;
-import java.util.List;
 import java.io.IOException;
-import java.sql.SQLException;
 
-@WebServlet("/")
+@WebServlet("/details")
 
-public class EmployeeHomeController extends HttpServlet {
+public class EmployeeDetailsController extends HttpServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private EmployeeService employeeService;
 
-    public EmployeeHomeController() {
+    public EmployeeDetailsController() {
     }
 
     @Override
@@ -38,23 +36,14 @@ public class EmployeeHomeController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int page = 1;
-        if (request.getParameter("page") != null) {
-            page = Integer.parseInt(request.getParameter("page"));
-        }
         try {
-            int recordsPerPage = 5;
-            int offset = (page - 1) * recordsPerPage;
-            List<Employee> employees = employeeService.findAll(offset, recordsPerPage);
-            int totalEmployees = employeeService.count();
-            int totalPages = (int) Math.ceil((double) totalEmployees / recordsPerPage);
-            request.setAttribute("employees", employees);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("currentPage", page);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            int employeeId = Integer.parseInt(request.getParameter("id"));
+            Employee employee = employeeService.findById(employeeId);
+            request.setAttribute("employee", employee);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        RequestDispatcher view = request.getRequestDispatcher("/pages/home.jsp");
+        RequestDispatcher view = request.getRequestDispatcher("/pages/details.jsp");
         view.forward(request, response);
     }
 }
